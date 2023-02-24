@@ -8,6 +8,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.boot.SpringApplication;
 
 import org.springframework.boot.test.context.SpringBootTest;
+
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -24,6 +25,7 @@ import java.util.List;
 @SpringBootTest
 public class FilmControllerTest {
     private RestTemplate restTemplate;
+
     private HttpHeaders headers;
     private ObjectMapper objectMapper;
     private final String url = "http://localhost:8080/films";

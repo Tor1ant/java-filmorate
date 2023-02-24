@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.junit.jupiter.api.*;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+@SpringBootTest
 public class UserControllerTest {
     private RestTemplate restTemplate;
     private ConfigurableApplicationContext ctx;

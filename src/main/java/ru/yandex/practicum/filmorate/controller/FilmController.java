@@ -19,14 +19,11 @@ import java.util.Map;
 public class FilmController {
     private int filmId = 0;
     private final Map<Integer, Film> films = new HashMap<>();
-    private final LocalDate BIRTH_OF_FILMS = LocalDate.of(1895, 12, 28);
+    private static final LocalDate BIRTH_OF_FILMS = LocalDate.of(1895, 12, 28);
 
     @PostMapping()
     private ResponseEntity<?> postFilm(@RequestBody @Valid Film film) {
-        if (film.getReleaseDate().isBefore(BIRTH_OF_FILMS)) {
-            throw new ValidationException("{\"validationException\":\"Дата создания фильма не может быть раньше " +
-                    "1895,12,28\"}");
-        }
+        validateFilm(film);
         film.setId(++filmId);
         films.put(film.getId(), film);
         log.debug("Фильмов в коллекции: " + films.size());
@@ -35,10 +32,7 @@ public class FilmController {
 
     @PutMapping()
     private ResponseEntity<?> putFilm(@RequestBody @Valid Film film) {
-        if (film.getReleaseDate().isBefore(BIRTH_OF_FILMS)) {
-            throw new ValidationException("{\"validationException\":\"Дата создания фильма не может быть раньше " +
-                    "1895,12,28\"}");
-        }
+        validateFilm(film);
         if (films.containsKey(film.getId())) {
             films.put(film.getId(), film);
             log.debug("Фильм с id " + film.getId() + " изменён");
@@ -51,5 +45,12 @@ public class FilmController {
     @GetMapping()
     private Collection<Film> getFilms() {
         return films.values();
+    }
+
+    private void validateFilm(Film film) {
+        if (film.getReleaseDate().isBefore(BIRTH_OF_FILMS)) {
+            throw new ValidationException("{\"validationException\":\"Дата создания фильма не может быть раньше " +
+                    "1895,12,28\"}");
+        }
     }
 }
