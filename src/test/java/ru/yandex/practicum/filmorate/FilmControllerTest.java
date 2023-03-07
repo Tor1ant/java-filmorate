@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
-public class FilmControllerTest {
+ public  class FilmControllerTest {
     private RestTemplate restTemplate;
 
     private HttpHeaders headers;

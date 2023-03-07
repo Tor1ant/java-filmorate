@@ -1,52 +1,36 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.Valid;
-
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private int userId = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final InMemoryUserStorage userStorage;
+
+    @Autowired
+    public UserController(InMemoryUserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @PostMapping
-    private ResponseEntity<?> postUser(@RequestBody @Valid User user) {
-        user.setId(++userId);
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
-        users.put(user.getId(), user);
-        log.debug("пользователей в коллекции: " + users.size());
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> postUser(@RequestBody @Valid User user) {
+        return userStorage.createUser(user);
     }
 
     @PutMapping
-    private ResponseEntity<?> putUser(@RequestBody @Valid User user) {
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.debug("пользователь с id " + user.getId() + " изменён");
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(user);
-        }
+    public ResponseEntity<?> putUser(@RequestBody @Valid User user) {
+        return userStorage.updateUser(user);
     }
 
     @GetMapping
     private Collection<User> getUsers() {
-        return users.values();
+        return userStorage.getUsers().values();
     }
 }
