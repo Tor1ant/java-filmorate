@@ -1,12 +1,14 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
-public interface FilmStorage {
-    ResponseEntity<?> createFilm(Film film);
+@Component
+public interface FilmStorage <T extends Film> {
+    ResponseEntity<?> createFilm(T t);
 
-    ResponseEntity<?> updateFilm(Film film);
+    ResponseEntity<?> updateFilm(T t);
 
-    ResponseEntity<?> deleteFilm(Film film);
+    ResponseEntity<?> deleteFilm(T t);
 }
