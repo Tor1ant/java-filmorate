@@ -7,14 +7,14 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.Map;
 
 @Component
-public interface UserStorage<T extends User> {
-    ResponseEntity<?> createUser(T t);
+public interface UserStorage {
+    ResponseEntity<?> createUser(User user);
 
-    ResponseEntity<?> updateUser(T t);
+    ResponseEntity<?> updateUser(User user);
 
-    ResponseEntity<?> deleteUser(T t);
+    ResponseEntity<?> deleteUser(User user);
 
-    Map<Integer, T> getUsers();
+    Map<Integer, User> getUsers();
 
 
 }

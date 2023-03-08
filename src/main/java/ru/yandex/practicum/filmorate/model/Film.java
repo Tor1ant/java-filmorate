@@ -7,11 +7,14 @@ import lombok.RequiredArgsConstructor;
 import javax.validation.constraints.*;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @RequiredArgsConstructor
 public class Film {
     private int id;
+    private final Set<Integer> likesByUserId;
     @NotEmpty
     private final String name;
     @Size(max = 200)
@@ -27,5 +30,6 @@ public class Film {
         this.description = null;
         this.releaseDate = null;
         this.duration = null;
+        this.likesByUserId = new HashSet<>();
     }
 }
