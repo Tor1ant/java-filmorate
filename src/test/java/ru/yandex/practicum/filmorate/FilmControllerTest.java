@@ -123,7 +123,6 @@ import java.util.List;
         Assertions.assertEquals("{\"validationException\":\"Дата создания фильма не может быть раньше " +
                 "1895,12,28\"}", httpClientErrorException.
                 getResponseBodyAsString());
-
     }
 
     @DisplayName("Создание фильма с продолжительностью меньше нуля и равной нулю")

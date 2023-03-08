@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -19,25 +20,41 @@ public class FilmService {
         this.filmStorage = filmStorage;
     }
 
-    public void addLikeToFilm(int id, int userId) {
+    public Film addLikeToFilm(int id, int userId) {
+        notFoundFilmValidation(id, userId);
         filmStorage.getFilms().get(id).getLikesByUserId().add(userId);
+        return filmStorage.getFilms().get(id);
     }
 
-    public void removeLikeFromFilm(int id, int userId) {
+    public Film removeLikeFromFilm(int id, int userId) {
+        notFoundFilmValidation(id, userId);
         filmStorage.getFilms().get(id).getLikesByUserId().remove(userId);
+        return filmStorage.getFilms().get(id);
     }
 
     public List<Film> mostLikedFilms(int count) {
         List<Film> result = new ArrayList<>(filmStorage.getFilms().values());
-        result.sort(Comparator.comparingInt(film -> film.getLikesByUserId().size()));
         if (count == 0) {
             if (filmStorage.getFilms().values().size() <= 10) {
+                result.sort(Comparator.comparingInt((Film film) -> film.getLikesByUserId().size()).reversed());
                 return result;
             } else
                 result = result.subList(0, 10);
+            result.sort(Comparator.comparingInt((Film film) -> film.getLikesByUserId().size()).reversed());
+            return result;
 
         } else
-            result = result.subList(0, count + 1);
+            result.sort(Comparator.comparingInt((Film film) -> film.getLikesByUserId().size()).reversed());
+        result = result.subList(0, count);
         return result;
+    }
+
+    private void notFoundFilmValidation(int id, int userId) {
+        if (!filmStorage.getFilms().containsKey(id)) {
+            throw new NotFoundException("{\"NotFoundException\":\"Фильма с таким id" + id + " не существует.\"}");
+        }
+        if (!filmStorage.getFilms().containsKey(userId)) {
+            throw new NotFoundException("{\"NotFoundException\":\"Пользователя с id" + userId + " не существует.\"}");
+        }
     }
 }

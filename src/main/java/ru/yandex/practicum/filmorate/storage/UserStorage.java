@@ -15,6 +15,4 @@ public interface UserStorage {
     ResponseEntity<?> deleteUser(User user);
 
     Map<Integer, User> getUsers();
-
-
 }

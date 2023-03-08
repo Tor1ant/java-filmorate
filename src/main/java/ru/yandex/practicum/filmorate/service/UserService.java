@@ -62,10 +62,10 @@ public class UserService {
 
     private void notFoundValidation(int id, int friendId) {
         if (!userStorage.getUsers().containsKey(id)) {
-            throw new NotFoundException("Пользователя с id" + id + " не существует.");
+            throw new NotFoundException("{\"NotFoundException\":\"Пользователя с id" + id + " не существует.\"}");
         }
         if (!userStorage.getUsers().containsKey(friendId)) {
-            throw new NotFoundException("Пользователя с id" + friendId + " не существует.");
+            throw new NotFoundException("{\"NotFoundException\":\"Пользователя с id" + friendId + " не существует.\"}");
         }
     }
 }

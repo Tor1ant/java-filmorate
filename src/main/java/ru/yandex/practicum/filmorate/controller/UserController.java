@@ -39,6 +39,10 @@ public class UserController {
     public Collection<User> getUsers() {
         return userStorage.getUsers().values();
     }
+    @DeleteMapping
+    public ResponseEntity<?> deleteFilm(@RequestBody User user) {
+        return userStorage.deleteUser(user);
+    }
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable() Integer id) {
@@ -48,7 +52,7 @@ public class UserController {
             }
             return userStorage.getUsers().get(id);
         }
-        throw new RuntimeException("непредвиденная ошибка.");
+        throw new RuntimeException("id пользователя задан неверно.");
     }
 
     @PutMapping("/{id}/friends/{friendId}")

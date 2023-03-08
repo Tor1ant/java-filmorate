@@ -16,7 +16,7 @@ import java.util.Set;
 public class Film {
     private int id;
     @Getter
-    private  Set<Integer> likesByUserId;
+    private Set<Integer> likesByUserId;
     @NotEmpty
     private final String name;
     @Size(max = 200)
