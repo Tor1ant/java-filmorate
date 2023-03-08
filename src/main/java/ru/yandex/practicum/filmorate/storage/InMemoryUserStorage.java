@@ -20,7 +20,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public ResponseEntity<?> createUser(User user) {
         user.setId(++userId);
-        if (user.getName() == null) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
         users.put(user.getId(), user);
@@ -44,6 +44,12 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public ResponseEntity<?> deleteUser(User user) {
-        return null;
+        if (users.containsKey(user.getId())) {
+            users.remove(user.getId());
+            log.debug("пользователь с id " + user.getId() + " удалён");
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(user);
+        }
     }
 }

@@ -45,7 +45,13 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public ResponseEntity<?> deleteFilm(Film film) {
-        return null;
+        if (films.containsKey(film.getId())) {
+            films.remove(film.getId());
+            log.debug("Фильм с id " + film.getId() + " удалён");
+            return ResponseEntity.ok(film);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(film);
+        }
     }
 
     private void validateFilm(Film film) {

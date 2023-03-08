@@ -81,6 +81,7 @@ public class UserControllerTest {
     public void should400BAD_REQUESTWhenPostUserWithWrongLogin() {
         User user = new User("312Gora@mail.ru", "Login Test", LocalDate.of(1998,
                 1, 26));
+
         user.setName("Frog265");
         HttpEntity<User> httpEntity = new HttpEntity<>(user, headers);
         HttpClientErrorException httpClientErrorException = Assertions.assertThrows(HttpClientErrorException.class,

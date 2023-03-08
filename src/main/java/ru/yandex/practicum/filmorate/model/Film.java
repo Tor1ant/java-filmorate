@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.*;
@@ -14,7 +15,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class Film {
     private int id;
-    private final Set<Integer> likesByUserId;
+    @Getter
+    private  Set<Integer> likesByUserId;
     @NotEmpty
     private final String name;
     @Size(max = 200)

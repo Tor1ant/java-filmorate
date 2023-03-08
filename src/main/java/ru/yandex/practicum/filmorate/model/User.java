@@ -16,7 +16,7 @@ import java.util.Set;
 public class User {
     private int id;
     @Getter
-    private final Set<Integer> friends;
+    private  Set<Integer> friends;
     @NotBlank(message = "email адрес не может быть пустым")
     @Email(message = "некорректный email адрес")
     private final String email;
