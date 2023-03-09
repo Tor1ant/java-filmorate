@@ -1,18 +1,16 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Map;
 
-@Component
 public interface UserStorage {
-    ResponseEntity<?> createUser(User user);
+    ResponseEntity<User> createUser(User user);
 
-    ResponseEntity<?> updateUser(User user);
+    ResponseEntity<User> updateUser(User user);
 
-    ResponseEntity<?> deleteUser(User user);
+    ResponseEntity<User> deleteUser(User user);
 
     Map<Integer, User> getUsers();
 }

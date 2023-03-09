@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,25 +16,25 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@Data
 public class InMemoryFilmStorage implements FilmStorage {
     private int filmId = 0;
+    @Getter
     private final Map<Integer, Film> films = new HashMap<>();
     private static final LocalDate BIRTH_OF_FILMS = LocalDate.of(1895, 12, 28);
 
     @Override
-    public ResponseEntity<?> createFilm(Film film) {
+    public ResponseEntity<Film> createFilm(Film film) {
         validateFilm(film);
         film.setId(++filmId);
         films.put(film.getId(), film);
-        log.debug("Фильмов в коллекции: " + films.size());
+        log.debug(film.toString());
         return ResponseEntity.ok(film);
     }
 
     @Override
-    public ResponseEntity<?> updateFilm(@RequestBody @Valid Film film) {
-        validateFilm(film);
+    public ResponseEntity<Film> updateFilm(@RequestBody @Valid Film film) {
         if (films.containsKey(film.getId())) {
+            validateFilm(film);
             films.put(film.getId(), film);
             log.debug("Фильм с id " + film.getId() + " изменён");
             return ResponseEntity.ok(film);
@@ -44,7 +44,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public ResponseEntity<?> deleteFilm(Film film) {
+    public ResponseEntity<Film> deleteFilm(Film film) {
         if (films.containsKey(film.getId())) {
             films.remove(film.getId());
             log.debug("Фильм с id " + film.getId() + " удалён");
