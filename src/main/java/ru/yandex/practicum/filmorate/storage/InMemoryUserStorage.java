@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,13 +12,15 @@ import java.util.Map;
 
 @Slf4j
 @Component
-@Data
+@Getter
 public class InMemoryUserStorage implements UserStorage {
+
     private int userId = 0;
+
     private final Map<Integer, User> users = new HashMap<>();
 
     @Override
-    public ResponseEntity<?> createUser(User user) {
+    public ResponseEntity<User> createUser(User user) {
         user.setId(++userId);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -29,7 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public ResponseEntity<?> updateUser(User user) {
+    public ResponseEntity<User> updateUser(User user) {
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
@@ -43,7 +45,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public ResponseEntity<?> deleteUser(User user) {
+    public ResponseEntity<User> deleteUser(User user) {
         if (users.containsKey(user.getId())) {
             users.remove(user.getId());
             log.debug("пользователь с id " + user.getId() + " удалён");
