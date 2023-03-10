@@ -1,56 +1,80 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.Exception.ValidationException;
+import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private int filmId = 0;
-    private final Map<Integer, Film> films = new HashMap<>();
-    private static final LocalDate BIRTH_OF_FILMS = LocalDate.of(1895, 12, 28);
+    private final FilmService filmService;
+    private final FilmStorage filmStorage;
+
+    @Autowired
+    public FilmController(FilmService filmService, FilmStorage filmStorage) {
+        this.filmService = filmService;
+        this.filmStorage = filmStorage;
+    }
 
     @PostMapping()
-    private ResponseEntity<?> postFilm(@RequestBody @Valid Film film) {
-        validateFilm(film);
-        film.setId(++filmId);
-        films.put(film.getId(), film);
-        log.debug("Фильмов в коллекции: " + films.size());
-        return ResponseEntity.ok(film);
+    public ResponseEntity<?> postFilm(@RequestBody @Valid Film film) {
+        return filmStorage.createFilm(film);
+
     }
 
     @PutMapping()
-    private ResponseEntity<?> putFilm(@RequestBody @Valid Film film) {
-        validateFilm(film);
-        if (films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            log.debug("Фильм с id " + film.getId() + " изменён");
-            return ResponseEntity.ok(film);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(film);
-        }
+    public ResponseEntity<?> putFilm(@RequestBody @Valid Film film) {
+        return filmStorage.updateFilm(film);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteFilm(@RequestBody Film film) {
+        return filmStorage.deleteFilm(film);
     }
 
     @GetMapping()
-    private Collection<Film> getFilms() {
-        return films.values();
+    @ResponseStatus(HttpStatus.OK)
+    public Collection<Film> getFilms() {
+        return filmStorage.getFilms().values();
     }
 
-    private void validateFilm(Film film) {
-        if (film.getReleaseDate().isBefore(BIRTH_OF_FILMS)) {
-            throw new ValidationException("{\"validationException\":\"Дата создания фильма не может быть раньше " +
-                    "1895,12,28\"}");
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Film getFilms(@PathVariable(required = false) Integer id) {
+        if (id != null) {
+            if (id < 1 || filmStorage.getFilms().size() < id) {
+                throw new NotFoundException("фильм с " + id + " не найден");
+            }
+            return filmStorage.getFilms().get(id);
+
         }
+        throw new RuntimeException("id фильма задан не верно.");
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Film addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+        return filmService.addLikeToFilm(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Film removeLikeFromFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+        return filmService.removeLikeFromFilm(id, userId);
+    }
+
+    @GetMapping("/popular")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "0") Integer count) {
+        return filmService.mostLikedFilms(count);
     }
 }

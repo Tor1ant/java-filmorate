@@ -1,52 +1,80 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import javax.validation.Valid;
-
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private int userId = 0;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final InMemoryUserStorage userStorage;
+    private final UserService userService;
+
+    @Autowired
+    public UserController(InMemoryUserStorage userStorage, UserService userService) {
+        this.userStorage = userStorage;
+        this.userService = userService;
+    }
 
     @PostMapping
-    private ResponseEntity<?> postUser(@RequestBody @Valid User user) {
-        user.setId(++userId);
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
-        users.put(user.getId(), user);
-        log.debug("пользователей в коллекции: " + users.size());
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> postUser(@RequestBody @Valid User user) {
+        return userStorage.createUser(user);
     }
 
     @PutMapping
-    private ResponseEntity<?> putUser(@RequestBody @Valid User user) {
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
-        }
-        if (users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.debug("пользователь с id " + user.getId() + " изменён");
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(user);
-        }
+    public ResponseEntity<?> putUser(@RequestBody @Valid User user) {
+        return userStorage.updateUser(user);
     }
 
-    @GetMapping
-    private Collection<User> getUsers() {
-        return users.values();
+    @GetMapping()
+    public Collection<User> getUsers() {
+        return userStorage.getUsers().values();
+    }
+    @DeleteMapping
+    public ResponseEntity<?> deleteFilm(@RequestBody User user) {
+        return userStorage.deleteUser(user);
+    }
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable() Integer id) {
+        if (id != null) {
+            if (id < 1 || userStorage.getUserId() < id) {
+                throw new NotFoundException("пользователь с " + id + " не найден");
+            }
+            return userStorage.getUsers().get(id);
+        }
+        throw new RuntimeException("id пользователя задан неверно.");
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public User addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        return userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    @ResponseStatus(HttpStatus.OK)
+    public User deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        return userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> getFriends(@PathVariable Integer id) {
+        return userService.getUserFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherID}")
+    public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherID) {
+        return userService.getCommonFriends(id, otherID);
     }
 }

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootTest
-public class FilmControllerTest {
+ public  class FilmControllerTest {
     private RestTemplate restTemplate;
 
     private HttpHeaders headers;
@@ -123,7 +123,6 @@ public class FilmControllerTest {
         Assertions.assertEquals("{\"validationException\":\"Дата создания фильма не может быть раньше " +
                 "1895,12,28\"}", httpClientErrorException.
                 getResponseBodyAsString());
-
     }
 
     @DisplayName("Создание фильма с продолжительностью меньше нуля и равной нулю")
