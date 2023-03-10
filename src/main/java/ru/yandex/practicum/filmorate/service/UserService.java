@@ -6,9 +6,9 @@ import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,26 +33,20 @@ public class UserService {
         if (!userStorage.getUsers().containsKey(id)) {
             throw new NotFoundException("Пользователя с id " + id + " не существует.");
         }
-        List<User> friends = new ArrayList<>();
-        for (Integer friendId : userStorage.getUsers().get(id).getFriends()) {
-            if (userStorage.getUsers().containsKey(friendId)) {
-                friends.add(userStorage.getUsers().get(friendId));
-            }
-        }
-        return friends;
+        return userStorage.getUsers().get(id).getFriends().stream()
+                .filter(userStorage.getUsers()::containsKey)
+                .map(userStorage.getUsers()::get)
+                .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(int id, int otherId) {
         notFoundValidation(id, otherId);
         Set<Integer> userFriends = userStorage.getUsers().get(id).getFriends();
         Set<Integer> otherUserFriends = userStorage.getUsers().get(otherId).getFriends();
-        List<User> commonFriends = new ArrayList<>();
-        for (Integer userFriend : userFriends) {
-            if (otherUserFriends.contains(userFriend)) {
-                commonFriends.add(userStorage.getUsers().get(userFriend));
-            }
-        }
-        return commonFriends;
+        return userFriends.stream()
+                .filter(otherUserFriends::contains)
+                .map(userStorage.getUsers()::get)
+                .collect(Collectors.toList());
     }
 
     private void notFoundValidation(int id, int friendId) {
