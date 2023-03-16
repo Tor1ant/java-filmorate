@@ -35,7 +35,7 @@ public class UserController {
         return userStorage.getUsers().values();
     }
     @DeleteMapping
-    public ResponseEntity<?> deleteFilm(@RequestBody User user) {
+    public ResponseEntity<?> deleteUser(@RequestBody User user) {
         return userStorage.deleteUser(user);
     }
 
