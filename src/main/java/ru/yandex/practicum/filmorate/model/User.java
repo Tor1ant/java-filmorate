@@ -16,7 +16,11 @@ import java.util.Set;
 public class User {
     private int id;
     @Getter
-    private  Set<Integer> friends;
+    private Set<Integer> friends;
+    @Getter
+    private Set<Integer> unconfirmedFriendRequest;
+    @Getter
+    private Set<Integer> confirmedFriendRequest;
     @NotBlank(message = "email адрес не может быть пустым")
     @Email(message = "некорректный email адрес")
     private final String email;
@@ -28,6 +32,7 @@ public class User {
     @Past
     private final LocalDate birthday;
 
+
     @JsonCreator
     public User() {
         this.email = null;
@@ -35,5 +40,7 @@ public class User {
         this.name = null;
         this.birthday = null;
         this.friends = new HashSet<>();
+        this.unconfirmedFriendRequest = new HashSet<>();
+        this.confirmedFriendRequest = new HashSet<>();
     }
 }

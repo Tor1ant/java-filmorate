@@ -21,12 +21,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> postUser(@RequestBody @Valid User user) {
+    public ResponseEntity<User> postUser(@RequestBody @Valid User user) {
         return userStorage.createUser(user);
     }
 
     @PutMapping
-    public ResponseEntity<?> putUser(@RequestBody @Valid User user) {
+    public ResponseEntity<User> putUser(@RequestBody @Valid User user) {
         return userStorage.updateUser(user);
     }
 
@@ -35,7 +35,7 @@ public class UserController {
         return userStorage.getUsers().values();
     }
     @DeleteMapping
-    public ResponseEntity<?> deleteUser(@RequestBody User user) {
+    public ResponseEntity<User> deleteUser(@RequestBody User user) {
         return userStorage.deleteUser(user);
     }
 

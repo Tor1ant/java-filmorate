@@ -21,18 +21,18 @@ public class FilmController {
     private final FilmStorage filmStorage;
 
     @PostMapping()
-    public ResponseEntity<?> postFilm(@RequestBody @Valid Film film) {
+    public ResponseEntity<Film> postFilm(@RequestBody @Valid Film film) {
         return filmStorage.createFilm(film);
 
     }
 
     @PutMapping()
-    public ResponseEntity<?> putFilm(@RequestBody @Valid Film film) {
+    public ResponseEntity<Film> putFilm(@RequestBody @Valid Film film) {
         return filmStorage.updateFilm(film);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteFilm(@RequestBody Film film) {
+    public ResponseEntity<Film> deleteFilm(@RequestBody Film film) {
         return filmStorage.deleteFilm(film);
     }
 

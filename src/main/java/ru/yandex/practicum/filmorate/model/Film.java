@@ -5,8 +5,9 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.*;
-
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +16,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class Film {
     private int id;
+    @Getter
+    private Set<FilmGenre> filmGenres;
+    @Getter
+    private Set<MPARating> mpaRatings;
     @Getter
     private Set<Integer> likesByUserId;
     @NotEmpty
@@ -33,5 +38,7 @@ public class Film {
         this.releaseDate = null;
         this.duration = null;
         this.likesByUserId = new HashSet<>();
+        this.filmGenres = new HashSet<>();
+        this.mpaRatings = new HashSet<>();
     }
 }
