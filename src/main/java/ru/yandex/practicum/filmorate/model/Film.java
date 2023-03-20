@@ -19,7 +19,7 @@ public class Film {
     @Getter
     private Set<FilmGenre> filmGenres;
     @Getter
-    private Set<MPARating> mpaRatings;
+    private MPARating mpaRating;
     @Getter
     private Set<Integer> likesByUserId;
     @NotEmpty
@@ -39,6 +39,6 @@ public class Film {
         this.duration = null;
         this.likesByUserId = new HashSet<>();
         this.filmGenres = new HashSet<>();
-        this.mpaRatings = new HashSet<>();
+        this.mpaRating = null;
     }
 }
