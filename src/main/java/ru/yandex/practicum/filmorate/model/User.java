@@ -18,9 +18,9 @@ public class User {
     @Getter
     private Set<Integer> friends;
     @Getter
-    private Set<Integer> unconfirmedFriendRequest;
+    private Set<Integer> unconfirmedFriendIDRequest;
     @Getter
-    private Set<Integer> confirmedFriendRequest;
+    private Set<Integer> confirmedFriendIDRequest;
     @NotBlank(message = "email адрес не может быть пустым")
     @Email(message = "некорректный email адрес")
     private final String email;
@@ -40,7 +40,7 @@ public class User {
         this.name = null;
         this.birthday = null;
         this.friends = new HashSet<>();
-        this.unconfirmedFriendRequest = new HashSet<>();
-        this.confirmedFriendRequest = new HashSet<>();
+        this.unconfirmedFriendIDRequest = new HashSet<>();
+        this.confirmedFriendIDRequest = new HashSet<>();
     }
 }
