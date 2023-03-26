@@ -9,17 +9,14 @@ import lombok.Setter;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Data
 @RequiredArgsConstructor
 public class User {
     private int id;
     @Getter
-    private Set<Integer> friends;
-    private Map<Integer, Boolean> friendStatus;
+    private Map<Integer, Boolean> friends;
     @NotBlank(message = "email адрес не может быть пустым")
     @Email(message = "некорректный email адрес")
     private final String email;
@@ -38,7 +35,6 @@ public class User {
         this.login = null;
         this.name = null;
         this.birthday = null;
-        this.friends = new HashSet<>();
-        this.friendStatus = new HashMap<>();
+        this.friends = new HashMap<>();
     }
 }
