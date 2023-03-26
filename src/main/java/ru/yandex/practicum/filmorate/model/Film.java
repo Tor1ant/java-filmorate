@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
@@ -14,9 +16,11 @@ import java.util.Set;
 
 @Data
 @RequiredArgsConstructor
+@Table(name = "FILMS")
 public class Film {
     private int id;
     @Getter
+    @ManyToOne
     private Set<FilmGenre> filmGenres;
     @Getter
     private MPARating mpaRating;
