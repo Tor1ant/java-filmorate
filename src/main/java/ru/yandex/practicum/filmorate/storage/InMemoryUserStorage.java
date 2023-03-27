@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@Component
+@Component("InMemoryUserStorage")
 @Getter
 public class InMemoryUserStorage implements UserStorage {
 
@@ -53,5 +53,10 @@ public class InMemoryUserStorage implements UserStorage {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(user);
         }
+    }
+
+    @Override
+    public User getUser(int id) {
+        return users.get(id);
     }
 }

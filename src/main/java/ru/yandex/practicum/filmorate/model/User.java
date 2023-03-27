@@ -1,10 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -12,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
+@Builder
 @RequiredArgsConstructor
 public class User {
     private int id;

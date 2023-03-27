@@ -1,13 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -17,7 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final InMemoryUserStorage userStorage;
+    @Qualifier("UserDbStorage")
+    private final UserStorage userStorage;
     private final UserService userService;
 
     @PostMapping
@@ -34,6 +36,7 @@ public class UserController {
     public Collection<User> getUsers() {
         return userStorage.getUsers().values();
     }
+
     @DeleteMapping
     public ResponseEntity<User> deleteUser(@RequestBody User user) {
         return userStorage.deleteUser(user);
@@ -42,10 +45,10 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUser(@PathVariable() Integer id) {
         if (id != null) {
-            if (id < 1 || userStorage.getUserId() < id) {
+            if (id < 1 || userStorage.getUsers().size() < id) {
                 throw new NotFoundException("пользователь с " + id + " не найден");
             }
-            return userStorage.getUsers().get(id);
+            return userStorage.getUser(id);
         }
         throw new RuntimeException("id пользователя задан неверно.");
     }
