@@ -100,7 +100,7 @@ create table if not exists FRIENDS
 (
     FRIEND_ID INTEGER,
     USER_ID   INTEGER,
-    STATUS_ID INTEGER,
+    STATUS_ID INTEGER DEFAULT 1,
     constraint "FRIENDS_USERS_FRIEND_ID_USER_ID"
         foreign key (FRIEND_ID) references USERS (USER_ID),
     constraint "FRIENDS_USERS_USER_ID_USER_ID"
