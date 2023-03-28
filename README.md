@@ -34,7 +34,7 @@ ORDER BY COUNT(U.NAME) desc;
 
 #### --получение списка общих друзей пользователей
 
-SELECT u.user_id, email, login, name, birthday\
+SELECT u.user_id, u.email, u.login, u.name, u.birthday\
 FROM FRIENDS as f1\
 JOIN FRIENDS as f2 ON f2.FRIEND_ID = f1.FRIEND_ID AND f2.USER_ID = 0\
 JOIN USERS U on U.USER_ID = f1.FRIEND_ID\

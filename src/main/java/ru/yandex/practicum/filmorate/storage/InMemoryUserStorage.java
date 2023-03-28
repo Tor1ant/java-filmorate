@@ -13,7 +13,7 @@ import java.util.Map;
 @Slf4j
 @Component("InMemoryUserStorage")
 @Getter
-public class InMemoryUserStorage implements UserStorage {
+public abstract class InMemoryUserStorage implements UserStorage {
 
     private int userId = 0;
 

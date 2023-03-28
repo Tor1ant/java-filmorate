@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Data
 @RequiredArgsConstructor
 @Table(name = "FILMS")
+@Builder
 public class Film {
     private int id;
     @Getter
