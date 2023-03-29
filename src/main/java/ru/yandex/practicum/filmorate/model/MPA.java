@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,7 +13,8 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @Table(name = "ratings")
-public class MPARating {
+@Builder
+public class MPA {
     @Id
     private int id;
     @Column(name = "name")

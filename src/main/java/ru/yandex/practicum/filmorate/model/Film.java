@@ -1,33 +1,28 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Table(name = "FILMS")
 @Builder
 public class Film {
     private int id;
     @Getter
-    @ManyToOne
-    private Set<FilmGenre> filmGenres;
+    private final Set<FilmGenre> filmGenres;
     @Getter
-    private MPARating mpaRating;
+    @Setter
+    @NotEmpty
+    private MPA mpa;
     @Getter
-    private Set<Integer> likesByUserId;
+    private final Set<Integer> likesByUserId;
     @NotEmpty
     private final String name;
     @Size(max = 200)
@@ -37,7 +32,7 @@ public class Film {
     @Positive
     private final Long duration;
 
-    @JsonCreator
+/*    @JsonCreator
     public Film() {
         this.name = null;
         this.description = null;
@@ -45,6 +40,6 @@ public class Film {
         this.duration = null;
         this.likesByUserId = new HashSet<>();
         this.filmGenres = new HashSet<>();
-        this.mpaRating = null;
-    }
+        this.mpa = null;
+    }*/
 }

@@ -16,7 +16,7 @@ import java.util.Map;
 @Slf4j
 @Repository("UserDbStorage")
 public class UserDbStorage implements UserStorage {
-    private int userId = 0;
+
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -26,11 +26,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public ResponseEntity<User> createUser(User user) {
-        user.setId(++userId);
-        String sqlQuery = "insert INTO USERS(USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+        String sqlQuery = "insert INTO USERS( EMAIL, LOGIN, NAME, BIRTHDAY) " +
+                "VALUES ( ?, ?, ?, ?)";
         jdbcTemplate.update(sqlQuery,
-                user.getId(),
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
@@ -40,6 +41,9 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public ResponseEntity<User> updateUser(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         String sqlQuery = "UPDATE USERS SET EMAIL =?, LOGIN =?, NAME =?, BIRTHDAY =? " +
                 "WHERE USER_ID=?";
         jdbcTemplate.update(sqlQuery,
@@ -77,6 +81,7 @@ public class UserDbStorage implements UserStorage {
                 .id(resultSet.getInt("USER_ID"))
                 .email(resultSet.getString("EMAIL"))
                 .login(resultSet.getString("LOGIN"))
+                .name(resultSet.getString("NAME"))
                 .birthday(resultSet.getDate("BIRTHDAY").toLocalDate())
                 .build();
     }

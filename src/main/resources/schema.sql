@@ -1,30 +1,28 @@
-drop table LIKES;
+/*drop table LIKES;
 drop table FILM_GENRE;
 drop table FILMS;
 drop table RATINGS;
 drop table GENRE;
 drop table FRIENDS;
 drop table USERS;
-drop table STATUS;
+drop table STATUS;*/
 
-create table if not exists RATINGS
+/*create table if not exists RATINGS
 (
-    RATING_ID INTEGER     not null,
-    NAME      VARCHAR(20) not null,
-    constraint "RATINGS_pk"
-        primary key (RATING_ID)
+    RATING_ID INT AUTO_INCREMENT PRIMARY KEY,
+    NAME      VARCHAR(20) not null
 );
 
-INSERT INTO RATINGS(RATING_ID, NAME)
-VALUES (0, 'G'),
-       (1, 'PG'),
-       (2, 'PG13'),
-       (3, 'R'),
-       (4, 'NC17');
+INSERT INTO RATINGS(NAME)
+VALUES ('G'),
+       ('PG'),
+       ('PG13'),
+       ('R'),
+       ('NC17');
 
 create table if not exists FILMS
 (
-    FILM_ID      INTEGER           not null,
+    FILM_ID      INTEGER auto_increment not null,
     NAME         CHARACTER VARYING not null,
     DESCRIPTION  CHARACTER VARYING(200),
     RELEASE_DATE DATE,
@@ -68,7 +66,7 @@ create table if not exists FILM_GENRE
 
 create table if not exists USERS
 (
-    USER_ID  INTEGER not null,
+    USER_ID  INTEGER primary key auto_increment not null,
     EMAIL    VARCHAR not null,
     LOGIN    VARCHAR not null,
     NAME     VARCHAR,
@@ -108,4 +106,4 @@ create table if not exists FRIENDS
     constraint "FRIENDS_STATUS_STATUS_ID_STATUS_ID"
         FOREIGN KEY (STATUS_ID) references STATUS (STATUS_ID),
     constraint unique_friend_status UNIQUE (USER_ID, FRIEND_ID, STATUS_ID)
-);
+);*/

@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.Exception.AddLikeException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,7 +19,7 @@ import java.util.Map;
 @Repository
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
-    private int filmId = 0;
+
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -28,17 +29,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public ResponseEntity<Film> createFilm(Film film) {
-        film.setId(++filmId);
-        String sqlQuery = "INSERT INTO FILMS(film_id, name, description, release_date, duration, RATING_ID)" +
-                "VALUES(?,?,?,?,?,?)";
+        String sqlQuery = "INSERT INTO FILMS(name, description, release_date, duration, RATING_ID)" +
+                "VALUES(?,?,?,?,?)";
         jdbcTemplate.update(sqlQuery,
-                film.getId(),
                 film.getName(),
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
-                film.getMpaRating());
-        log.info("В коллекцию добавлен фильм " + film.getName() + "/ количество фильмов в коллекции: " + filmId);
+                film.getMpa().getId());
+        log.info("В коллекцию добавлен фильм " + film.getName());
         return ResponseEntity.ok(film);
     }
 
@@ -50,7 +49,8 @@ public class FilmDbStorage implements FilmStorage {
                 film.getName(),
                 film.getDescription(),
                 film.getReleaseDate(),
-                film.getMpaRating(),
+                film.getDuration(),
+                film.getMpa().getId(),
                 film.getId());
         log.info("Фильм с id " + film.getId() + " изменен на фильм " + film.getName());
         return ResponseEntity.ok(film);
@@ -61,7 +61,6 @@ public class FilmDbStorage implements FilmStorage {
         String sqlQuery = "DELETE FROM FILMS WHERE FILM_ID =?";
         jdbcTemplate.update(sqlQuery, film.getId());
         log.info("фильм " + film.getName() + " удален");
-        filmId--;
         return ResponseEntity.ok(film);
     }
 
@@ -71,24 +70,38 @@ public class FilmDbStorage implements FilmStorage {
                 .name(resultSet.getString("NAME"))
                 .description(resultSet.getString("DESCRIPTION"))
                 .releaseDate(resultSet.getDate("RELEASE_DATE").toLocalDate())
+                .duration(resultSet.getLong("DURATION"))
+                .mpa(MPA.builder()
+                        .id(resultSet.getInt("RATING_ID"))
+                        .name(resultSet.getString("NAME"))
+                        .build())
+                .build();
+    }
+
+    private MPA mapRowToMPA(ResultSet resultSet, int rowNum) throws SQLException {
+        return MPA.builder()
+                .id(resultSet.getInt("RATING_ID"))
+                .name(resultSet.getString("NAME"))
                 .build();
     }
 
     @Override
     public Map<Integer, Film> getFilms() {
         Map<Integer, Film> resultFilms = new HashMap<>();
-        String sqlQuery = "SELECT * FROM films";
+        String sqlQuery = "SELECT * FROM FILMS JOIN RATINGS R on FILMS.RATING_ID = R.RATING_ID";
         List<Film> films = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
         films.forEach(film -> resultFilms.put(film.getId(), film));
-        log.info("получен список всех " + filmId + " фильмов");
+        log.info("получен список всех " + films.size() + " фильмов");
         return resultFilms;
     }
 
     @Override
     public Film getFilm(int id) {
-        String sqlQuery = "SELECT * FROM FILMS WHERE FILM_ID = ?";
+        String sqlQuery = "SELECT * FROM FILMS JOIN RATINGS R on FILMS.RATING_ID = R.RATING_ID WHERE FILM_ID = ?";
         log.info("получен фильм с id " + id);
-        return jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
+        Film film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, id);
+        log.info("получен фильм: " + (film != null ? film.getName() : null));
+        return film;
     }
 
     @Override
@@ -99,12 +112,14 @@ public class FilmDbStorage implements FilmStorage {
         } catch (DataAccessException e) {
             throw new AddLikeException("Невозможно поставить лайк к фильму.");
         }
+        log.info("пользователь " + userId + " поставил лайк фильму с id " + filmId);
     }
 
     @Override
     public void removeLikeFromFilm(Integer id, Integer userId) {
         String sqlQuery = "DELETE  FROM LIKES WHERE FILM_ID=? AND USER_ID =?";
         jdbcTemplate.update(sqlQuery, id, userId);
+        log.info("пользователь " + userId + " удалил лайк с фильма с id " + id);
     }
 
     @Override
