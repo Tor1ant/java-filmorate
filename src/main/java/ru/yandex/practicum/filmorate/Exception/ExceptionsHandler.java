@@ -28,7 +28,7 @@ public class ExceptionsHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String EmptyResultDataAccessExceptionHandler(final EmptyResultDataAccessException e) {
         log.debug(e.getMessage());
-        return "Пользователь для добавления в друзья не найден";
+        return e.getMessage();
     }
 
     @ExceptionHandler(AddLikeException.class)

@@ -1,22 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-@AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "ratings")
-@Builder
+@AllArgsConstructor
 public class MPA {
-    @Id
-    private int id;
-    @Column(name = "name")
+
+    private final int id;
+
     private String name;
+
+    @JsonCreator
+    public MPA(@JsonProperty("id") int id) {
+        this.id = id;
+    }
 }

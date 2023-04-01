@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -36,7 +39,10 @@ public class UserDbStorage implements UserStorage {
                 user.getLogin(),
                 user.getName(),
                 user.getBirthday());
-        return ResponseEntity.ok(user);
+
+        String sqlQueryGetUser = "SELECT * FROM USERS WHERE LOGIN = ?";
+        User userToResponse = jdbcTemplate.queryForObject(sqlQueryGetUser, this::mapRowToUser, user.getLogin());
+        return ResponseEntity.ok(userToResponse);
     }
 
     @Override
@@ -52,13 +58,26 @@ public class UserDbStorage implements UserStorage {
                 user.getName(),
                 user.getBirthday(),
                 user.getId());
-        return ResponseEntity.ok(user);
+
+        String sqlQueryGetUser = "SELECT * FROM USERS WHERE USER_ID = ?";
+        User userToResponse;
+        try {
+            userToResponse = jdbcTemplate.queryForObject(sqlQueryGetUser, this::mapRowToUser, user.getId());
+        } catch (DataAccessException e) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("NotFoundException", "Пользователь не найден в базе данных");
+            throw new NotFoundException(jsonObject.toJSONString());
+        }
+        return ResponseEntity.ok(userToResponse);
     }
 
     @Override
     public ResponseEntity<User> deleteUser(User user) {
-        String sqlQuery = "DELETE FROM USERS WHERE USER_ID =?";
-        jdbcTemplate.update(sqlQuery, user.getId());
+        String sqlQuery = "DELETE  FROM FRIENDS WHERE USER_ID =1 OR FRIEND_ID =?;" +
+                "DELETE  FROM LIKES WHERE USER_ID =?;" +
+                "DELETE  FROM USERS WHERE USER_ID =?;";
+
+        jdbcTemplate.update(sqlQuery, user.getId(), user.getId(), user.getId());
         return ResponseEntity.ok(user);
     }
 
@@ -87,9 +106,15 @@ public class UserDbStorage implements UserStorage {
     }
 
     public User addFriend(int id, int friendId) {
-        String sqlQuery = "insert into FRIENDS(FRIEND_ID, USER_ID, STATUS_ID)" +
-                "VALUES(FRIEND_ID =?, USER_ID =?, STATUS_ID=?)";
-        jdbcTemplate.update(sqlQuery, id, friendId);
+        String sqlQuery = "insert into FRIENDS(FRIEND_ID, USER_ID)" +
+                "VALUES(?, ?)";
+        try {
+            jdbcTemplate.update(sqlQuery, friendId, id);
+        } catch (DataAccessException e) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("NotFoundException", "Пользователь для добавления в друзья не найден.");
+            throw new NotFoundException(jsonObject.toJSONString());
+        }
         return getUser(friendId);
     }
 
@@ -103,7 +128,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getUserFriends(Integer id) {
         String sqlQuery = "SELECT * from USERS where USER_ID in (select FRIEND_ID from FRIENDS where USER_ID = ?)";
-        List<User> users = jdbcTemplate.query(sqlQuery, this::mapRowToUser);
+        List<User> users = jdbcTemplate.query(sqlQuery, this::mapRowToUser, id);
         log.info("пользователь с id " + id + "получил список друзей состоящий из " + users.size() + " позиций");
         return users;
     }
@@ -115,7 +140,7 @@ public class UserDbStorage implements UserStorage {
                 "JOIN FRIENDS as f2 ON f2.FRIEND_ID = f1.FRIEND_ID AND f2.USER_ID = ? " +
                 "JOIN USERS U on U.USER_ID = f1.FRIEND_ID " +
                 "WHERE f1.USER_ID = ?";
-        List<User> users = jdbcTemplate.query(sqlQuery, this::mapRowToUser);
+        List<User> users = jdbcTemplate.query(sqlQuery, this::mapRowToUser, id, otherId);
         log.info("пользователь с id " + id + "получил список общих друзей с пользователем id " + otherId + " состоящий" +
                 " из " + users.size() + " позиций");
         return users;

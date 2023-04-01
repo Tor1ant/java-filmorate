@@ -1,29 +1,21 @@
-/*drop table LIKES;
-drop table FILM_GENRE;
-drop table FILMS;
-drop table RATINGS;
-drop table GENRE;
-drop table FRIENDS;
-drop table USERS;
-drop table STATUS;*/
-
-/*create table if not exists RATINGS
+create table if not exists RATINGS
 (
-    RATING_ID INT AUTO_INCREMENT PRIMARY KEY,
+    RATING_ID INT  PRIMARY KEY,
     NAME      VARCHAR(20) not null
 );
 
-INSERT INTO RATINGS(NAME)
-VALUES ('G'),
-       ('PG'),
-       ('PG13'),
-       ('R'),
-       ('NC17');
+MERGE INTO RATINGS (RATING_ID,NAME)
+    VALUES (1,'G'),
+           (2,'PG'),
+           (3,'PG13'),
+           (4,'R'),
+           (5,'NC17');
+
 
 create table if not exists FILMS
 (
-    FILM_ID      INTEGER auto_increment not null,
-    NAME         CHARACTER VARYING not null,
+    FILM_ID      INTEGER auto_increment,
+    NAME         CHARACTER VARYING      not null,
     DESCRIPTION  CHARACTER VARYING(200),
     RELEASE_DATE DATE,
     DURATION     INTEGER,
@@ -34,25 +26,19 @@ create table if not exists FILMS
         foreign key (RATING_ID) references RATINGS
 );
 
-create table if not exists GENRE
+create table if not exists GENRES
 (
-    GENRE_ID INTEGER auto_increment primary key,
-    NAME     CHARACTER VARYING not null
+    GENRE_ID INTEGER  primary key,
+    NAME     VARCHAR not null
 );
 
-INSERT INTO GENRE(GENRE_ID, NAME)
-VALUES (0, 'Р±РѕРµРІРёРє'),
-       (1, 'РІРµСЃС‚РµСЂРЅ'),
-       (2, 'РґРµС‚РµРєС‚РёРІ'),
-       (3, 'РёСЃС‚РѕСЂРёС‡РµСЃРєРёР№'),
-       (4, 'РґСЂР°РјР°'),
-       (5, 'РєРѕРјРµРґРёСЏ'),
-       (6, 'РјРµР»РѕРґСЂР°РјР°'),
-       (7, 'РїСЂРёРєР»СЋС‡РµРЅРёСЏ'),
-       (8, 'С‚СЂРёР»Р»РµСЂС‹'),
-       (9, 'СѓР¶Р°СЃС‹'),
-       (10, 'С„Р°РЅС‚Р°СЃС‚РёРєР°');
-
+MERGE INTO GENRES (GENRE_ID,NAME)
+    VALUES (1,'комедия'),
+           (2,'драма'),
+           (3,'мультфильм'),
+           (4,'триллер'),
+           (5,'документальный'),
+           (6,'боевик');
 
 create table if not exists FILM_GENRE
 (
@@ -61,16 +47,16 @@ create table if not exists FILM_GENRE
     constraint "film_genre_FILMS_film_id_fk"
         foreign key (FILM_ID) references FILMS,
     constraint "film_genre_GENRE_GENRE_ID_fk"
-        foreign key (GENRE_ID) references GENRE
+        foreign key (GENRE_ID) references GENRES
 );
 
 create table if not exists USERS
 (
     USER_ID  INTEGER primary key auto_increment not null,
-    EMAIL    VARCHAR not null,
-    LOGIN    VARCHAR not null,
+    EMAIL    VARCHAR                            not null,
+    LOGIN    VARCHAR                            not null,
     NAME     VARCHAR,
-    BIRTHDAY date    not null,
+    BIRTHDAY date                               not null,
     constraint "USERS_pk"
         primary key (USER_ID)
 );
@@ -94,6 +80,10 @@ create table if not exists STATUS
     constraint unique_status UNIQUE (STATUS)
 );
 
+MERGE INTO STATUS (STATUS_ID)
+    VALUES (1),
+           (2);
+
 create table if not exists FRIENDS
 (
     FRIEND_ID INTEGER,
@@ -106,4 +96,5 @@ create table if not exists FRIENDS
     constraint "FRIENDS_STATUS_STATUS_ID_STATUS_ID"
         FOREIGN KEY (STATUS_ID) references STATUS (STATUS_ID),
     constraint unique_friend_status UNIQUE (USER_ID, FRIEND_ID, STATUS_ID)
-);*/
+);
+
