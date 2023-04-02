@@ -26,14 +26,14 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(EmptyResultDataAccessException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String EmptyResultDataAccessExceptionHandler(final EmptyResultDataAccessException e) {
+    public String emptyResultDataAccessExceptionHandler(final EmptyResultDataAccessException e) {
         log.debug(e.getMessage());
         return e.getMessage();
     }
 
     @ExceptionHandler(AddLikeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String AddLikeExceptionHandler(final AddLikeException e) {
+    public String addLikeExceptionHandler(final AddLikeException e) {
         log.debug(e.getMessage());
         return e.getMessage();
     }
