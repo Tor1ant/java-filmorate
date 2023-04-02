@@ -17,13 +17,13 @@ public class MPAController {
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<MPA> getGenres() {
+    public List<MPA> getRatings() {
         return mpaService.getAllMPA();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public MPA getGenreById(@PathVariable int id) {
+    public MPA getRatingById(@PathVariable int id) {
         return mpaService.getMPA(id);
     }
 }

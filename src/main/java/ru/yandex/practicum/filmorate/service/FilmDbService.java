@@ -15,9 +15,9 @@ public class FilmDbService {
     private final FilmDbStorage filmDbStorage;
 
 
-    public void addLikeToFilm(Integer id, Integer userId) {
+    public int addLikeToFilm(Integer id, Integer userId) {
         log.info("Пользователь с id " + userId + "поставил лайк фильму с id " + id);
-        filmDbStorage.addLikeToFilm(id, userId);
+      return   filmDbStorage.addLikeToFilm(id, userId);
     }
 
     public void removeLikeFromFilm(Integer id, Integer userId) {

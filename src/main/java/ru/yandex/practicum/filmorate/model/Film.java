@@ -10,6 +10,7 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ import java.util.Set;
 @Builder
 public class Film {
     private int id;
-    private Set<FilmGenre> genres;
+    private List<FilmGenre> genres;
 
     private MPA mpa;
 

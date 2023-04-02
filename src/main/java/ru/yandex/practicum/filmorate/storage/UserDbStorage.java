@@ -106,9 +106,9 @@ public class UserDbStorage implements UserStorage {
     }
 
     public User addFriend(int id, int friendId) {
-        String sqlQuery = "insert into FRIENDS(FRIEND_ID, USER_ID)" +
-                "VALUES(?, ?)";
         try {
+            String sqlQuery = "insert into FRIENDS(FRIEND_ID, USER_ID)" +
+                    "VALUES(?, ?)";
             jdbcTemplate.update(sqlQuery, friendId, id);
         } catch (DataAccessException e) {
             JSONObject jsonObject = new JSONObject();

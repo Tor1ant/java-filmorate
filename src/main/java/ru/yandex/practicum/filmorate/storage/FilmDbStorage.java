@@ -39,18 +39,8 @@ public class FilmDbStorage implements FilmStorage {
                 .withTableName("FILMS")
                 .usingGeneratedKeyColumns("FILM_ID");
         int filmId = simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue();
-
-        Optional<Set<FilmGenre>> filmGenres = Optional.ofNullable(film.getGenres());
-        if (filmGenres.isPresent()) {
-            simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
-            for (FilmGenre genre : film.getGenres()) {
-                Map<String, Integer> data = new HashMap<>();
-                data.put("FILM_ID", filmId);
-                data.put("GENRE_ID", genre.getId());
-                simpleJdbcInsert.withTableName("FILM_GENRE").usingColumns("FILM_ID", "GENRE_ID")
-                        .execute(data);
-            }
-        }
+        Optional<List<FilmGenre>> filmGenres = Optional.ofNullable(film.getGenres());
+        setGenresToFilmInDb(filmGenres, filmId);
         return ResponseEntity.ok(getFilm(filmId));
     }
 
@@ -66,17 +56,31 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDuration(),
                 film.getMpa().getId(),
                 film.getId());
-
+        Optional<List<FilmGenre>> filmGenres = Optional.ofNullable(film.getGenres());
+        setGenresToFilmInDb(filmGenres, film.getId());
         log.info("Фильм с id " + film.getId() + " изменен на фильм " + film.getName());
         return ResponseEntity.ok(getFilm(film.getId()));
     }
 
+    private void setGenresToFilmInDb(Optional<List<FilmGenre>> filmGenres, int filmId) {
+        String deleteQuery = "DELETE  FROM FILM_GENRE WHERE FILM_ID =?";
+        jdbcTemplate.update(deleteQuery, filmId);
+        if (filmGenres.isPresent() && !filmGenres.get().isEmpty()) {
+            for (FilmGenre genre : filmGenres.get()) {
+                String insertQuery = "MERGE INTO FILM_GENRE (FILM_ID, GENRE_ID) KEY (FILM_ID,GENRE_ID) VALUES (?, ?)";
+                jdbcTemplate.update(insertQuery, filmId, genre.getId());
+            }
+        }
+    }
+
     @Override
-    public ResponseEntity<Film> deleteFilm(Film film) {
-        String sqlQuery = "DELETE FROM FILMS WHERE FILM_ID =?";
-        jdbcTemplate.update(sqlQuery, film.getId());
-        log.info("фильм " + film.getName() + " удален");
-        return ResponseEntity.ok(film);
+    public ResponseEntity<String> deleteFilm(Integer id) {
+        String sqlQuery = "DELETE FROM LIKES WHERE FILM_ID =?;" +
+                "DELETE FROM FILM_GENRE WHERE FILM_ID=?; " +
+                "DELETE FROM FILMS WHERE FILM_ID =?";
+        jdbcTemplate.update(sqlQuery, id, id, id);
+        log.info("фильм " + id + " удален");
+        return ResponseEntity.ok("фильм с id " + id + " удалён");
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -90,18 +94,21 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
 
         List<FilmGenre> filmGenreSet = getGenresForFilm(film.getId());
-        film.setGenres(new HashSet<>(filmGenreSet));
+        film.setGenres(filmGenreSet);
         return film;
     }
 
     private List<FilmGenre> getGenresForFilm(int filmId) {
+        List<FilmGenre> genres;
         String sqlQuery = "SELECT G.GENRE_ID, G.NAME " +
                 "FROM GENRES AS G " +
                 "JOIN FILM_GENRE AS FG ON G.GENRE_ID = FG.GENRE_ID " +
-                "WHERE FG.FILM_ID =?";
-        return jdbcTemplate.query(sqlQuery, (resultSet, rowNum) ->
+                "WHERE FG.FILM_ID =? ";
+        genres = jdbcTemplate.query(sqlQuery, (resultSet, rowNum) ->
                         new FilmGenre(resultSet.getInt("GENRE_ID"), resultSet.getString("NAME")),
                 filmId);
+        genres.sort(Comparator.comparingInt(FilmGenre::getId));
+        return genres;
     }
 
     @Override
@@ -136,14 +143,16 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void addLikeToFilm(int filmId, int userId) {
+    public int addLikeToFilm(int filmId, int userId) {
         String sqlQuery = "INSERT INTO LIKES(FILM_ID, USER_ID) VALUES ( ?,? )";
+        int countLines;
         try {
-            jdbcTemplate.update(sqlQuery, filmId, userId);
+            countLines = jdbcTemplate.update(sqlQuery, filmId, userId);
         } catch (DataAccessException e) {
             throw new AddLikeException("Невозможно поставить лайк к фильму.");
         }
         log.info("пользователь " + userId + " поставил лайк фильму с id " + filmId);
+        return countLines;
     }
 
     @Override

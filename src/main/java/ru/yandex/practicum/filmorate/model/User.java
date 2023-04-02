@@ -26,5 +26,4 @@ public class User {
     private String name;
     @Past
     private final LocalDate birthday;
-
 }

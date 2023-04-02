@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,7 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmDbService filmService;
-    @Qualifier("FilmDbStorage")
+
     private final FilmStorage filmStorage;
 
     @PostMapping()
@@ -33,9 +32,9 @@ public class FilmController {
         return filmStorage.updateFilm(film);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Film> deleteFilm(@RequestBody Film film) {
-        return filmStorage.deleteFilm(film);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFilm(@PathVariable Integer id) {
+        return filmStorage.deleteFilm(id);
     }
 
     @GetMapping()
@@ -46,7 +45,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Film getFilms(@PathVariable(required = false) Integer id) {
+    public Film getFilm(@PathVariable(required = false) Integer id) {
         if (id != null) {
             if (id < 1 || filmStorage.getFilms().size() < id) {
                 throw new NotFoundException("фильм с " + id + " не найден");
@@ -59,8 +58,8 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public void addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) {
-        filmService.addLikeToFilm(id, userId);
+    public int addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+      return   filmService.addLikeToFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")

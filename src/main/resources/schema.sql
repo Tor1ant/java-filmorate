@@ -7,9 +7,9 @@ create table if not exists RATINGS
 MERGE INTO RATINGS (RATING_ID,NAME)
     VALUES (1,'G'),
            (2,'PG'),
-           (3,'PG13'),
+           (3,'PG-13'),
            (4,'R'),
-           (5,'NC17');
+           (5,'NC-17');
 
 
 create table if not exists FILMS
@@ -33,12 +33,12 @@ create table if not exists GENRES
 );
 
 MERGE INTO GENRES (GENRE_ID,NAME)
-    VALUES (1,'комедия'),
-           (2,'драма'),
-           (3,'мультфильм'),
-           (4,'триллер'),
-           (5,'документальный'),
-           (6,'боевик');
+    VALUES (1,'Комедия'),
+           (2,'Драма'),
+           (3,'Мультфильм'),
+           (4,'Триллер'),
+           (5,'Документальный'),
+           (6,'Боевик');
 
 create table if not exists FILM_GENRE
 (
