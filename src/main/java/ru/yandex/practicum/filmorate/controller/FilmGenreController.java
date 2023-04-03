@@ -18,12 +18,14 @@ public class FilmGenreController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public List<FilmGenre> getGenres() {
+
         return filmGenreDbService.getGenres();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public FilmGenre getGenreById(@PathVariable int id) {
+
         return filmGenreDbService.getGenreById(id);
     }
 }

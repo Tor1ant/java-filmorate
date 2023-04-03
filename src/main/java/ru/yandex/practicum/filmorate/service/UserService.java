@@ -1,20 +1,22 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-public interface UserStorage {
+public interface UserService {
+
     User createUser(User user);
 
     User updateUser(User user);
 
+    Collection<User> getUsers();
+
     User deleteUser(User user);
 
-    Map<Integer, User> getUsers();
-
-    User getUser(int id);
+    User getUser(@PathVariable() Integer id);
 
     User addFriend(int id, int friendId);
 

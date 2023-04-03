@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.FilmGenre;
@@ -10,15 +10,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class FilmGenreDbStorage {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public FilmGenreDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
 
     public List<FilmGenre> getFilmGenres() {
         String sqlQuery = "SELECT* FROM GENRES";

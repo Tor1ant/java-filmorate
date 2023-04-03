@@ -1,15 +1,14 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.Exception.AddLikeException;
-import ru.yandex.practicum.filmorate.Exception.NotFoundException;
-import ru.yandex.practicum.filmorate.Exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.AddLikeException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.FilmGenre;
 import ru.yandex.practicum.filmorate.model.MPA;
@@ -21,31 +20,27 @@ import java.util.*;
 
 @Repository
 @Slf4j
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private static final LocalDate BIRTH_OF_FILMS = LocalDate.of(1895, 12, 28);
 
-    @Autowired
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     @Override
-    public ResponseEntity<Film> createFilm(Film film) {
+    public Film createFilm(Film film) {
         validateFilm(film);
-        log.info("В коллекцию добавлен фильм " + film.getName());
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("FILMS")
                 .usingGeneratedKeyColumns("FILM_ID");
         int filmId = simpleJdbcInsert.executeAndReturnKey(film.toMap()).intValue();
+        log.info("В коллекцию добавлен фильм " + film.getName());
         Optional<List<FilmGenre>> filmGenres = Optional.ofNullable(film.getGenres());
         setGenresToFilmInDb(filmGenres, filmId);
-        return ResponseEntity.ok(getFilm(filmId));
+        return getFilm(filmId);
     }
 
     @Override
-    public ResponseEntity<Film> updateFilm(Film film) {
+    public Film updateFilm(Film film) {
         validateFilm(film);
         String sqlQuery = "UPDATE FILMS SET NAME =?, DESCRIPTION =?, RELEASE_DATE =?, DURATION =?, RATING_ID =? " +
                 "WHERE FILM_ID=?";
@@ -59,7 +54,7 @@ public class FilmDbStorage implements FilmStorage {
         Optional<List<FilmGenre>> filmGenres = Optional.ofNullable(film.getGenres());
         setGenresToFilmInDb(filmGenres, film.getId());
         log.info("Фильм с id " + film.getId() + " изменен на фильм " + film.getName());
-        return ResponseEntity.ok(getFilm(film.getId()));
+        return getFilm(film.getId());
     }
 
     private void setGenresToFilmInDb(Optional<List<FilmGenre>> filmGenres, int filmId) {
@@ -74,13 +69,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public ResponseEntity<String> deleteFilm(Integer id) {
+    public String deleteFilm(Integer id) {
         String sqlQuery = "DELETE FROM LIKES WHERE FILM_ID =?;" +
                 "DELETE FROM FILM_GENRE WHERE FILM_ID=?; " +
                 "DELETE FROM FILMS WHERE FILM_ID =?";
         jdbcTemplate.update(sqlQuery, id, id, id);
         log.info("фильм " + id + " удален");
-        return ResponseEntity.ok("фильм с id " + id + " удалён");
+        return "фильм с id " + id + " удалён";
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

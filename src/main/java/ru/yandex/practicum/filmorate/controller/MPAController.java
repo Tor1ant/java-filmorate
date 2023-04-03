@@ -18,12 +18,14 @@ public class MPAController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public List<MPA> getRatings() {
+
         return mpaService.getAllMPA();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public MPA getRatingById(@PathVariable int id) {
+
         return mpaService.getMPA(id);
     }
 }

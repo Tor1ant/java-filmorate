@@ -1,13 +1,12 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.Exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
@@ -18,17 +17,13 @@ import java.util.Map;
 
 @Slf4j
 @Repository("UserDbStorage")
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
     @Override
-    public ResponseEntity<User> createUser(User user) {
+    public User createUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -41,12 +36,11 @@ public class UserDbStorage implements UserStorage {
                 user.getBirthday());
 
         String sqlQueryGetUser = "SELECT * FROM USERS WHERE LOGIN = ?";
-        User userToResponse = jdbcTemplate.queryForObject(sqlQueryGetUser, this::mapRowToUser, user.getLogin());
-        return ResponseEntity.ok(userToResponse);
+        return jdbcTemplate.queryForObject(sqlQueryGetUser, this::mapRowToUser, user.getLogin());
     }
 
     @Override
-    public ResponseEntity<User> updateUser(User user) {
+    public User updateUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -68,17 +62,17 @@ public class UserDbStorage implements UserStorage {
             jsonObject.put("NotFoundException", "Пользователь не найден в базе данных");
             throw new NotFoundException(jsonObject.toJSONString());
         }
-        return ResponseEntity.ok(userToResponse);
+        return userToResponse;
     }
 
     @Override
-    public ResponseEntity<User> deleteUser(User user) {
+    public User deleteUser(User user) {
         String sqlQuery = "DELETE  FROM FRIENDS WHERE USER_ID =1 OR FRIEND_ID =?;" +
                 "DELETE  FROM LIKES WHERE USER_ID =?;" +
                 "DELETE  FROM USERS WHERE USER_ID =?;";
 
         jdbcTemplate.update(sqlQuery, user.getId(), user.getId(), user.getId());
-        return ResponseEntity.ok(user);
+        return user;
     }
 
     @Override
