@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.Exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -17,59 +15,59 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    private final FilmService filmService;
-    private final FilmStorage filmStorage;
+
+    private final FilmService filmDbService;
 
     @PostMapping()
     public ResponseEntity<Film> postFilm(@RequestBody @Valid Film film) {
-        return filmStorage.createFilm(film);
 
+        return ResponseEntity.ok(filmDbService.createFilm(film));
     }
 
     @PutMapping()
     public ResponseEntity<Film> putFilm(@RequestBody @Valid Film film) {
-        return filmStorage.updateFilm(film);
+
+        return ResponseEntity.ok(filmDbService.updateFilm(film));
     }
 
-    @DeleteMapping
-    public ResponseEntity<Film> deleteFilm(@RequestBody Film film) {
-        return filmStorage.deleteFilm(film);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFilm(@PathVariable Integer id) {
+
+        return ResponseEntity.ok(filmDbService.deleteFilm(id));
     }
 
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getFilms() {
-        return filmStorage.getFilms().values();
+
+        return filmDbService.getFilms();
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Film getFilms(@PathVariable(required = false) Integer id) {
-        if (id != null) {
-            if (id < 1 || filmStorage.getFilms().size() < id) {
-                throw new NotFoundException("фильм с " + id + " не найден");
-            }
-            return filmStorage.getFilms().get(id);
+    public Film getFilm(@PathVariable(required = false) Integer id) {
 
-        }
-        throw new RuntimeException("id фильма задан не верно.");
+        return filmDbService.getFilm(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public Film addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) {
-        return filmService.addLikeToFilm(id, userId);
+    public int addLikeToFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+
+        return filmDbService.addLikeToFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public Film removeLikeFromFilm(@PathVariable Integer id, @PathVariable Integer userId) {
-        return filmService.removeLikeFromFilm(id, userId);
+    public void removeLikeFromFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+
+        filmDbService.removeLikeFromFilm(id, userId);
     }
 
     @GetMapping("/popular")
     @ResponseStatus(HttpStatus.OK)
     public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "0") Integer count) {
-        return filmService.mostLikedFilms(count);
+
+        return filmDbService.mostLikedFilms(count);
     }
 }

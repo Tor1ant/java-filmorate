@@ -1,44 +1,45 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
+import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Data
-@RequiredArgsConstructor
+@Table(name = "FILMS")
+@Builder
 public class Film {
     private int id;
-    @Getter
-    private Set<FilmGenre> filmGenres;
-    @Getter
-    private MPARating mpaRating;
-    @Getter
-    private Set<Integer> likesByUserId;
+    private List<FilmGenre> genres;
+
+    private MPA mpa;
+
+    private final Set<Integer> likesByUserId;
     @NotEmpty
     private final String name;
     @Size(max = 200)
     private final String description;
-
+    @Past
     private final LocalDate releaseDate;
     @Positive
     private final Long duration;
 
-    @JsonCreator
-    public Film() {
-        this.name = null;
-        this.description = null;
-        this.releaseDate = null;
-        this.duration = null;
-        this.likesByUserId = new HashSet<>();
-        this.filmGenres = new HashSet<>();
-        this.mpaRating = null;
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("NAME", name);
+        values.put("DESCRIPTION", description);
+        values.put("RELEASE_DATE", releaseDate);
+        values.put("DURATION", duration);
+        values.put("RATING_ID", mpa.getId());
+        return values;
     }
 }

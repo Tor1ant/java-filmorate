@@ -1,25 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 @Data
-@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
 public class User {
     private int id;
     @Getter
-    private Set<Integer> friends;
-    private Map<Integer, Boolean> friendStatus;
+    private final Map<Integer, Boolean> friends;
     @NotBlank(message = "email адрес не может быть пустым")
     @Email(message = "некорректный email адрес")
     private final String email;
@@ -30,15 +26,4 @@ public class User {
     private String name;
     @Past
     private final LocalDate birthday;
-
-
-    @JsonCreator
-    public User() {
-        this.email = null;
-        this.login = null;
-        this.name = null;
-        this.birthday = null;
-        this.friends = new HashSet<>();
-        this.friendStatus = new HashMap<>();
-    }
 }

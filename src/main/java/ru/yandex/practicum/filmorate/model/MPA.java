@@ -5,16 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @AllArgsConstructor
-@Builder
 @Data
-public class FilmGenre {
+public class MPA {
 
-    private int id;
+    private final int id;
 
     private String name;
 
     @JsonCreator
-    public FilmGenre(@JsonProperty("id") int id) {
+    public MPA(@JsonProperty("id") int id) {
         this.id = id;
     }
 }
